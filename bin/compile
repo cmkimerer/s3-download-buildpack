@@ -23,7 +23,7 @@ s3simple() {
     return 1
   fi
 
-  local resource="/${BUCKET_NAME}/${file}"
+  local resource="/${S3_BUILDPACK_BUCKET_NAME}/${file}"
   local contentType="binary/octet-stream"
   local dateValue=`TZ=GMT date -R`
   local stringToSign="GET\n\n${contentType}\n${dateValue}\n${resource}"
@@ -33,18 +33,18 @@ s3simple() {
      -H "Date: ${dateValue}" \
      -H "Content-Type: ${contentType}" \
      -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:${signature}" \
-     https://s3.${AWS_REGION}.amazonaws.com/${BUCKET_NAME}/${file}
+     https://s3.${AWS_REGION}.amazonaws.com/${S3_BUILDPACK_BUCKET_NAME}/${file}
 }
 
 cd $build
 
-for e in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION BUCKET_NAME; do
+for e in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION S3_BUILDPACK_BUCKET_NAME; do
   if [ -f $env/$e ]; then
     export "$e=$(cat $env/$e)"
   fi
 done
 
 while read line; do
-  echo "-----> s3 downloading https://s3.${AWS_REGION}.amazonaws.com/${BUCKET_NAME}/${line}"
+  echo "-----> s3 downloading https://s3.${AWS_REGION}.amazonaws.com/${S3_BUILDPACK_BUCKET_NAME}/${line}"
   s3simple get $line > $line
 done < .buildpack-s3-downloads
