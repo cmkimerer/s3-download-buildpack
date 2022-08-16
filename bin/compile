@@ -46,5 +46,6 @@ done
 
 while read line; do
   echo "-----> s3 downloading https://s3.${AWS_REGION}.amazonaws.com/${S3_BUILDPACK_BUCKET_NAME}/${line}"
-  s3simple get $line > $line
+  IFS=' ' read -a pcs <<< "$line"
+  s3simple get "${pcs[0]}" > "${pcs[1]}"
 done < .buildpack-s3-downloads
